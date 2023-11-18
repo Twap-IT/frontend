@@ -31,7 +31,7 @@ const chains = [
 
 // 1. Get projectID at https://cloud.walletconnect.com
 
-const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || "bc51c1051f4f8da7bd3b3d09f7519ae5";
+const projectId = "bc51c1051f4f8da7bd3b3d09f7519ae5";
 
 // 2. Set chains
 const mainnet_ = {
