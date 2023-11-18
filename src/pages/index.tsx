@@ -28,11 +28,11 @@ const params: CowSwapWidgetParams = {
   "chainId": 1, // 1 (Mainnet), 5 (Goerli), 100 (Gnosis)
   "tradeType": TradeType.SWAP, // TradeType.SWAP, TradeType.LIMIT or TradeType.ADVANCED
   "sell": { // Sell token. Optionally add amount for sell orders
-    "asset": "COW",
-    "amount": "100000"
+    "asset": "USDC",
+    "amount": "100"
   },
   "buy": { // Buy token. Optionally add amount for buy orders
-    "asset": "USDC",
+    "asset": "COW",
     "amount": "0"
   },
   "enabledTradeTypes": [ // TradeType.SWAP, TradeType.LIMIT and/or TradeType.ADVANCED
@@ -48,28 +48,27 @@ const params: CowSwapWidgetParams = {
 export default function Home() {
   return (
     <div>
-
-      <div className="">
-
-        <div className=''>
-
-
-        </div>
+      <div className="container">
         <div className='container'>
-        <h2 className="" style={{ color: 'black' }}>
+          <h2 className="" style={{ color: 'black', padding: '35px' }}>
             Cow Twaps Telegram
           </h2>
-          <h3>
-            asdfad
-          </h3>
-
           <CowSwapWidget params={params} />
 
-        </div>
 
-        <h2 className="">
+
+        </div>
+        {params.sell?.amount}
+        {/* <h2 className="">
           A crypto exchange that <b>can</b> escape from a straitjacket
-        </h2>
+        </h2> */}
+
+        <div style={{ position: 'relative' }}>
+          <CowSwapWidget params={params} />
+          <button style={{ position: 'absolute', top: '10px', right: '10px' }}>
+            My Button
+          </button>
+        </div>
 
       </div>
     </div>

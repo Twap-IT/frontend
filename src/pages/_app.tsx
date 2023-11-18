@@ -1,14 +1,7 @@
 import "@/styles/globals.css";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
-// import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5/react'
-import { ethers } from 'ethers'
 import type { NextPageWithLayout } from '@/types';
 import { ThemeProvider } from 'next-themes';
-
-
-// base css file
-
-
 import { WagmiConfig } from "wagmi";
 import type { AppProps } from "next/app";
 import { useEffect, useState } from "react";
