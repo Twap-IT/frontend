@@ -6,6 +6,8 @@ import type { NextPageWithLayout } from '@/types';
 import { ThemeProvider } from 'next-themes';
 
 
+// base css file
+
 
 import { WagmiConfig } from "wagmi";
 import type { AppProps } from "next/app";

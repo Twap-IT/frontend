@@ -49,17 +49,25 @@ export default function Home() {
   return (
     <div>
 
-      <div className="flex flex-col items-center justify-center min-h-screen py-4">
+      <div className="">
 
-        <div className="mx-auto max-w-md ">
-          <h2 className="mb-14 text-lg font-medium uppercase text-center tracking-wider text-gray-900 dark:text-white sm:mb-10 sm:text-2xl">
-            Cow Twaps Telegram
-          </h2>
+        <div className=''>
+
 
         </div>
-        <CowSwapWidget params={params} />
+        <div className='container'>
+        <h2 className="" style={{ color: 'black' }}>
+            Cow Twaps Telegram
+          </h2>
+          <h3>
+            asdfad
+          </h3>
 
-        <h2 className="py-10 text-lg font-medium uppercase text-center tracking-wider text-gray-900 dark:text-white ">
+          <CowSwapWidget params={params} />
+
+        </div>
+
+        <h2 className="">
           A crypto exchange that <b>can</b> escape from a straitjacket
         </h2>
 

@@ -37,6 +37,7 @@ body,
 #__next {
 	min-height: 100% !important;
 	height: 100%;
+	background: white;
 }
 
 body {
@@ -73,4 +74,14 @@ li {
 header {
 	position: fixed;
 	width: 100%;
+}
+
+.container {
+	display: grid;
+	place-items: center;
+	height: auto;
+}
+
+.text-black {
+	color: black;
 }
