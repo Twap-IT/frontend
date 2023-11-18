@@ -25,7 +25,7 @@ const chains = [
 	arbitrum,
 	bsc,
 	optimism,
-	gnosis,
+	// gnosis,
 	fantom,
 ];
 
@@ -34,13 +34,21 @@ const chains = [
 const projectId = "bc51c1051f4f8da7bd3b3d09f7519ae5";
 
 // 2. Set chains
-const mainnet_ = {
-	chainId: 1,
-	name: 'Ethereum',
-	currency: 'ETH',
-	explorerUrl: 'https://etherscan.io',
-	rpcUrl: 'https://cloudflare-eth.com'
-  }
+// const mainnet_ = {
+// 	chainId: 1,
+// 	name: 'Ethereum',
+// 	currency: 'ETH',
+// 	explorerUrl: 'https://etherscan.io',
+// 	rpcUrl: 'https://cloudflare-eth.com'
+//   }
+
+//   const gnosis = {
+// 	chainId: 100,
+// 	name: 'Gnosis',
+// 	currency: 'XDAI',
+// 	explorerUrl: 'https://gnosisscan.io',
+// 	rpcUrl: 'https://gnosis.publicnode.com'
+//   }
 
 // 3. Create modal
 const metadata = {

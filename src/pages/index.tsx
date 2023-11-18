@@ -23,7 +23,8 @@ const params: CowSwapWidgetParams = {
     "height": "640px",
     // "provider": window.ethereum,// Ethereum EIP-1193 provider. For a quick test, you can pass `window.ethereum`, but consider using something like https://web3modal.com
     "provider": typeof window === 'undefined' ? undefined : window.ethereum as CowSwapWidgetParams['provider'],// Ethereum EIP-1193 provider. For a quick test, you can pass `window.ethereum`, but consider using something like https://web3modal.com
-    "chainId": 1, // 1 (Mainnet), 5 (Goerli), 100 (Gnosis)
+    // "chainId": 1, // 1 (Mainnet), 5 (Goerli), 100 (Gnosis)
+    "chainId": 100, // 1 (Mainnet), 5 (Goerli), 100 (Gnosis)
     "tradeType": TradeType.SWAP, // TradeType.SWAP, TradeType.LIMIT or TradeType.ADVANCED
     "sell": { // Sell token. Optionally add amount for sell orders
         "asset": "COW",
