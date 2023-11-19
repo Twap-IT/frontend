@@ -51,17 +51,14 @@ const params: CowSwapWidgetParams = {
   "theme": "light", // light/dark or provide your own color palette
   "interfaceFeeBips": "50" // Fill the form above if you are interested
 }
-
 const RESOLVER_CONTRACT = '0x8E08aD80c9c83D2cCf4AC3E41e3C7953dd5bBC74';
+let RESOLVER_JOB_CONTRACT = '0x3d5378fb58069e135047c085be7fa10faef749fd';
 const AGENT_CONTRACT = '0x071412e301C2087A4DAA055CF4aFa2683cE1e499';
 const SWAP_ROUTER = '0xBACa92421Bc530c1a6f4431aa5BBd30de0EDa384'
 const TOKENA_CONTRACT = '0x65fddb65ab0394b0c8cf6cd3e4a931f87f9e5143';
 const TOKENB_CONTRACT = '0x500c99a6b976ba30877598b3ffd672ac001a756d';
 const SLIPPAGE = 0.05;
 const TOKEN_DECIMALS = 18;
-
-
-
 
 
 export default function Home() {
@@ -94,9 +91,10 @@ export default function Home() {
     args: [
       RESOLVER_CONTRACT,
       TOKENA_CONTRACT,
-      TOKENB_CONTRACT, 
+      TOKENB_CONTRACT,
       1 * (10 ^ TOKEN_DECIMALS),
-      1 * (10 ^ TOKEN_DECIMALS), (tokenAmount * (1 - SLIPPAGE)) * (10 ^ TOKEN_DECIMALS),
+      1 * (10 ^ TOKEN_DECIMALS),
+      (tokenAmount * (1 - SLIPPAGE)) * (10 ^ TOKEN_DECIMALS),
       tokenAmount,
       tokenBAmount,
       SWAP_ROUTER
@@ -112,9 +110,10 @@ export default function Home() {
   let jobkey = txDataResolver?.logs[2].topics[1];
   let RESOLVER_JOB_CONTRACT = txDataResolver?.logs[0].address
 
-  if(!jobkey == null){
-    console.log('jobkey received', jobkey)
+  if (!jobkey == null) {
+    console.log('jobkey received & factory set', jobkey)
     console.log('factory address', txDataResolver?.logs[0].address)
+    RESOLVER_JOB_CONTRACT = txDataResolver?.logs[0].address;
   }
 
   const { config: configAgent } = usePrepareContractWrite({
@@ -131,10 +130,10 @@ export default function Home() {
     hash: dataAgent?.hash,
   })
 
-  if(!dataAgent == null){
+  if (!txDataAgent == null) {
     console.log('tx data agent received', dataAgent)
   }
-  
+
   // console.log(dataAgent)
   // console.log('data', configData);
   // console.log('config', configData?.logs[2])
@@ -155,51 +154,50 @@ export default function Home() {
     hash: dataAgentDeposit?.hash,
   })
 
-  if(!txDataAgentDeposit == null){
-    console.log('tx data agent deposit received', dataAgentDeposit)
+  if (!txDataAgentDeposit == null) {
+    console.log('tx data agent deposit received', txDataAgentDeposit)
   }
 
-  // const { config: configTokenAContract } = usePrepareContractWrite({
-  //   address: TOKENA_CONTRACT,
-  //   abi: ERC20ABI,
-  //   functionName: 'approve',
-  //   args: [
-  //     RESOLVER_JOB_CONTRACT,
-  //     1 * (10 ^ TOKEN_DECIMALS)
-  //   ],
-  //   value: parseEther("0.01")
-  // })
+  const { config: configTokenAContract } = usePrepareContractWrite({
+    address: TOKENA_CONTRACT,
+    abi: ERC20ABI,
+    functionName: 'approve',
+    args: [
+      RESOLVER_JOB_CONTRACT,
+      tokenAmount
+    ],
+    value: parseEther("0.01")
+  })
 
-  // const { data: dataTokenA, error: errorTokenA, isError: isErrorTokenA, write: writeTokenA, isSuccess: isSuccessTokenA } = useContractWrite(configTokenAContract)
-  // const { data: txDataTokenA } = useWaitForTransaction({
-  //   hash: dataTokenA?.hash,
-  // })
+  const { data: dataTokenA, error: errorTokenA, isError: isErrorTokenA, write: writeTokenA, isSuccess: isSuccessTokenA } = useContractWrite(configTokenAContract)
+  const { data: txDataTokenA } = useWaitForTransaction({
+    hash: dataTokenA?.hash,
+  })
 
-  // if(!txDataTokenA == null){
-  //   console.log('tx data TokenA received', dataTokenA)
-  // }
+  if (!txDataTokenA == null) {
+    console.log('tx data TokenA received', dataTokenA)
+  }
 
-  // const { config: configTokenBContract } = usePrepareContractWrite({
-  //   address: TOKENB_CONTRACT,
-  //   abi: ERC20ABI,
-  //   functionName: 'approve',
-  //   args: [
-  //     RESOLVER_JOB_CONTRACT,
-  //     1 * (10 ^ TOKEN_DECIMALS)
-  //   ],
-  //   value: parseEther("0.01")
-  // })
+  const { config: configTokenBContract } = usePrepareContractWrite({
+    address: TOKENB_CONTRACT,
+    abi: ERC20ABI,
+    functionName: 'approve',
+    args: [
+      RESOLVER_JOB_CONTRACT,
+      tokenBAmount
+    ],
+    value: parseEther("0.01")
+  })
 
 
-  // const { data: dataTokenB, error: errorTokenB, isError: isErrorTokenB, write: writeTokenB, isSuccess: isSuccessTokenB } = useContractWrite(configTokenBContract)
-  // const { data: txDataTokenB } = useWaitForTransaction({
-  //   hash: dataTokenB?.hash,
-  // })
+  const { data: dataTokenB, error: errorTokenB, isError: isErrorTokenB, write: writeTokenB, isSuccess: isSuccessTokenB } = useContractWrite(configTokenBContract)
+  const { data: txDataTokenB } = useWaitForTransaction({
+    hash: dataTokenB?.hash,
+  })
 
-  // if(!txDataTokenB == null){
-  //   console.log('tx data TokenB received', dataTokenB)
-  // }
-
+  if (!txDataTokenB == null) {
+    console.log('tx data TokenB received', dataTokenB)
+  }
 
   return (
     <div>
@@ -227,94 +225,7 @@ export default function Home() {
           </div>
         </nav>
         <div className='container'>
-
-
-          <div className=''>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                writeResolver?.();
-              }}
-              style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}
-            >
-              <div>
-                <label htmlFor="tokenAId" style={{ padding: '10px' }}>Token A ID</label>
-                <input
-                  id="tokenAId"
-                  onChange={(e) => setTokenAId(e.target.value)}
-                  placeholder={params.sell?.asset}
-                  style={{ padding: '10px' }}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="tokenAmount" style={{ padding: '10px' }}>Token A Amount</label>
-                <input
-                  id="tokenAmount"
-                  onChange={(e) => setTokenAmount(Number(e.target.value))}
-                  placeholder={params.sell?.amount}
-                  value={tokenAmount}
-                  type="number"
-                  style={{ padding: '10px' }}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="tokenBId" style={{ padding: '10px' }}>Token B ID</label>
-                <input
-                  id="tokenBId"
-                  onChange={(e) => setTokenBId(e.target.value)}
-                  placeholder={params.buy?.asset}
-                  style={{ padding: '10px' }}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="tokenBAmount" style={{ padding: '10px' }}>Token B Amount</label>
-                <input
-                  id="tokenBAmount"
-                  onChange={(e) => setTokenBAmount(Number(e.target.value))}
-                  placeholder={params.buy?.amount}
-                  value={tokenBAmount}
-                  style={{ padding: '10px' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'right', margin: '20px' }}>
-                <button type="submit" className='my-button'>
-                  Submit
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <button onClick={(e) => {
-            e.preventDefault();
-            writeAgent?.()
-            console.log('agent written')
-          }} className='my-button'>
-            Submit Acccept Job Transfer
-          </button>
-
-          <button onClick={(e) => {
-            e.preventDefault();
-            writeAgentDeposit?.()
-            console.log('agent deposit written')
-          }} className='my-button'>
-            Submit Acccept Deposit Job Transfer
-          </button>
-
-          <button onClick={(e) => {
-            e.preventDefault();
-            writeTokenA?.()
-            console.log('agent deposit written')
-          }} className='my-button'>
-            Write Token A
-          </button>
-
-
-
-          <div className="buttons-container">
+          <div className="buttons-container" style={{ padding: '10px' }}>
             <button
               className="my-button"
               onClick={handleBuyWithTime}>
@@ -329,7 +240,97 @@ export default function Home() {
           </div>
 
 
-          {/* {selectedOption === 'time' && <CowSwapWidget params={params} />}*/}
+          {selectedOption === 'time' && <CowSwapWidget params={params} />}
+          {selectedOption === 'price' &&
+            <div>
+
+              <div className=''>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    writeResolver?.();
+                    console.log('form submitted')
+                  }}
+                  style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}
+                >
+                  <div>
+                    <label htmlFor="tokenAId" style={{ padding: '10px' }}>Token A ID</label>
+                    <input
+                      id="tokenAId"
+                      onChange={(e) => setTokenAId(e.target.value)}
+                      placeholder={params.sell?.asset}
+                      style={{ padding: '10px' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="tokenAmount" style={{ padding: '10px' }}>Token A Amount</label>
+                    <input
+                      id="tokenAmount"
+                      onChange={(e) => setTokenAmount(Number(e.target.value))}
+                      placeholder={params.sell?.amount}
+                      value={tokenAmount}
+                      type="number"
+                      style={{ padding: '10px' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="tokenBId" style={{ padding: '10px' }}>Token B ID</label>
+                    <input
+                      id="tokenBId"
+                      onChange={(e) => setTokenBId(e.target.value)}
+                      placeholder={params.buy?.asset}
+                      style={{ padding: '10px' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="tokenBAmount" style={{ padding: '10px' }}>Token B Amount</label>
+                    <input
+                      id="tokenBAmount"
+                      onChange={(e) => setTokenBAmount(Number(e.target.value))}
+                      placeholder={params.buy?.amount}
+                      value={tokenBAmount}
+                      style={{ padding: '10px' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'right', margin: '20px' }}>
+                    <button type="submit" className='my-button'>
+                      Submit
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <button onClick={(e) => {
+                e.preventDefault();
+                writeAgent?.()
+                console.log(RESOLVER_JOB_CONTRACT)
+                console.log('agent written')
+              }} className='my-button'>
+                Submit Acccept Job Transfer
+              </button>
+
+              <button onClick={(e) => {
+                e.preventDefault();
+                writeAgentDeposit?.()
+                console.log('agent deposit written')
+              }} className='my-button'>
+                Submit Acccept Deposit Job Transfer
+              </button>
+
+              <button onClick={(e) => {
+                e.preventDefault();
+                writeTokenA?.()
+                console.log('write tokena')
+              }} className='my-button'>
+                Write Token A
+              </button>
+
+
+            </div>}
           <div>
             <h2 className="" style={{ color: 'white', padding: '35px' }}>
               -------------------------------------
