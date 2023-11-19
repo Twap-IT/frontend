@@ -29,7 +29,7 @@ interface JsonRpcRequest {
 //  Fill this form https://cowprotocol.typeform.com/to/rONXaxHV once you pick your "appCode"
 const params: CowSwapWidgetParams = {
   "appCode": "Cow Twaps Telegram", // Name of your app (max 50 characters)
-  "width": "550px", // Width in pixels (or 100% to use all available space)
+  "width": "350px", // Width in pixels (or 100% to use all available space)
   "height": "640px",
   // "provider": window.ethereum,// Ethereum EIP-1193 provider. For a quick test, you can pass `window.ethereum`, but consider using something like https://web3modal.com
   "provider": typeof window === 'undefined' ? undefined : window.ethereum as CowSwapWidgetParams['provider'],// Ethereum EIP-1193 provider. For a quick test, you can pass `window.ethereum`, but consider using something like https://web3modal.com
