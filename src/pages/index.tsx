@@ -1,8 +1,13 @@
 
 import { CowSwapWidget, CowSwapWidgetParams, TradeType } from '@cowprotocol/widget-react'
 import { ethers } from 'ethers';
+import { parseEther } from 'viem';
 import React, { useState } from 'react';
 import ResolverABI from '../assets/ResolverABI.json'
+import AgentABI from '../assets/AgentABI.json'
+import ERC20ABI from '../assets/ERC20ABI.json'
+import { useAccount } from 'wagmi'
+
 
 import {
   useConnect, usePrepareContractWrite, useContractWrite, useWaitForTransaction,
@@ -47,12 +52,16 @@ const params: CowSwapWidgetParams = {
   "interfaceFeeBips": "50" // Fill the form above if you are interested
 }
 
-const RESOLVER_CONTRACT = '0x1266E1566C3314b23D720C9A1f740DA32A57fCe2';
+const RESOLVER_CONTRACT = '0x8E08aD80c9c83D2cCf4AC3E41e3C7953dd5bBC74';
+const AGENT_CONTRACT = '0x071412e301C2087A4DAA055CF4aFa2683cE1e499';
 const SWAP_ROUTER = '0xBACa92421Bc530c1a6f4431aa5BBd30de0EDa384'
 const TOKENA_CONTRACT = '0x65fddb65ab0394b0c8cf6cd3e4a931f87f9e5143';
 const TOKENB_CONTRACT = '0x500c99a6b976ba30877598b3ffd672ac001a756d';
 const SLIPPAGE = 0.05;
 const TOKEN_DECIMALS = 18;
+
+
+
 
 
 export default function Home() {
@@ -63,6 +72,7 @@ export default function Home() {
   const [tokenBId, setTokenBId] = useState('');
   const [tokenBAmount, setTokenBAmount] = useState(Number(params.buy?.amount));
   const { connect, connectors, isLoading, pendingConnector } = useConnect();
+  const { address } = useAccount();
 
   const handleBuyWithTime = () => {
     setSelectedOption('time');
@@ -84,7 +94,8 @@ export default function Home() {
     args: [
       RESOLVER_CONTRACT,
       TOKENA_CONTRACT,
-      TOKENB_CONTRACT, 1 * (10 ^ TOKEN_DECIMALS),
+      TOKENB_CONTRACT, 
+      1 * (10 ^ TOKEN_DECIMALS),
       1 * (10 ^ TOKEN_DECIMALS), (tokenAmount * (1 - SLIPPAGE)) * (10 ^ TOKEN_DECIMALS),
       tokenAmount,
       tokenBAmount,
@@ -93,13 +104,102 @@ export default function Home() {
     enabled: Boolean(tokenAId),
   })
 
-  const { data, error, isError, write, isSuccess } = useContractWrite(configResolver)
-
-  const { data: configData } = useWaitForTransaction({
-    hash: data?.hash,
+  const { data: dataResolver, error: errorResolver, isError: isErrorResolver, write: writeResolver, isSuccess: isSuccessResolver } = useContractWrite(configResolver)
+  const { data: txDataResolver } = useWaitForTransaction({
+    hash: dataResolver?.hash,
   })
 
-  console.log(configData);
+  let jobkey = txDataResolver?.logs[2].topics[1];
+  let RESOLVER_JOB_CONTRACT = txDataResolver?.logs[0].address
+
+  if(!jobkey == null){
+    console.log('jobkey received', jobkey)
+    console.log('factory address', txDataResolver?.logs[0].address)
+  }
+
+  const { config: configAgent } = usePrepareContractWrite({
+    address: AGENT_CONTRACT,
+    abi: AgentABI,
+    functionName: 'acceptJobTransfer',
+    args: [
+      jobkey
+    ]
+  })
+
+  const { data: dataAgent, error: errorAgent, isError: isErrorAgent, write: writeAgent, isSuccess: isSuccessAgent } = useContractWrite(configAgent)
+  const { data: txDataAgent } = useWaitForTransaction({
+    hash: dataAgent?.hash,
+  })
+
+  if(!dataAgent == null){
+    console.log('tx data agent received', dataAgent)
+  }
+  
+  // console.log(dataAgent)
+  // console.log('data', configData);
+  // console.log('config', configData?.logs[2])
+  // console.log('topic ', configData?.logs[2].topics[1])
+
+  const { config: configAgentDeposit } = usePrepareContractWrite({
+    address: AGENT_CONTRACT,
+    abi: AgentABI,
+    functionName: 'depositJobOwnerCredits',
+    args: [
+      address
+    ],
+    value: parseEther("0.01")
+  })
+
+  const { data: dataAgentDeposit, error: errorAgentDeposit, isError: isErrorAgentDeposit, write: writeAgentDeposit, isSuccess: isSuccessAgentDeposit } = useContractWrite(configAgentDeposit)
+  const { data: txDataAgentDeposit } = useWaitForTransaction({
+    hash: dataAgentDeposit?.hash,
+  })
+
+  if(!txDataAgentDeposit == null){
+    console.log('tx data agent deposit received', dataAgentDeposit)
+  }
+
+  // const { config: configTokenAContract } = usePrepareContractWrite({
+  //   address: TOKENA_CONTRACT,
+  //   abi: ERC20ABI,
+  //   functionName: 'approve',
+  //   args: [
+  //     RESOLVER_JOB_CONTRACT,
+  //     1 * (10 ^ TOKEN_DECIMALS)
+  //   ],
+  //   value: parseEther("0.01")
+  // })
+
+  // const { data: dataTokenA, error: errorTokenA, isError: isErrorTokenA, write: writeTokenA, isSuccess: isSuccessTokenA } = useContractWrite(configTokenAContract)
+  // const { data: txDataTokenA } = useWaitForTransaction({
+  //   hash: dataTokenA?.hash,
+  // })
+
+  // if(!txDataTokenA == null){
+  //   console.log('tx data TokenA received', dataTokenA)
+  // }
+
+  // const { config: configTokenBContract } = usePrepareContractWrite({
+  //   address: TOKENB_CONTRACT,
+  //   abi: ERC20ABI,
+  //   functionName: 'approve',
+  //   args: [
+  //     RESOLVER_JOB_CONTRACT,
+  //     1 * (10 ^ TOKEN_DECIMALS)
+  //   ],
+  //   value: parseEther("0.01")
+  // })
+
+
+  // const { data: dataTokenB, error: errorTokenB, isError: isErrorTokenB, write: writeTokenB, isSuccess: isSuccessTokenB } = useContractWrite(configTokenBContract)
+  // const { data: txDataTokenB } = useWaitForTransaction({
+  //   hash: dataTokenB?.hash,
+  // })
+
+  // if(!txDataTokenB == null){
+  //   console.log('tx data TokenB received', dataTokenB)
+  // }
+
 
   return (
     <div>
@@ -131,9 +231,9 @@ export default function Home() {
 
           <div className=''>
             <form
-              onSubmit={async (e) => {
+              onSubmit={(e) => {
                 e.preventDefault();
-                write?.();
+                writeResolver?.();
               }}
               style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}
             >
@@ -187,6 +287,31 @@ export default function Home() {
               </div>
             </form>
           </div>
+
+          <button onClick={(e) => {
+            e.preventDefault();
+            writeAgent?.()
+            console.log('agent written')
+          }} className='my-button'>
+            Submit Acccept Job Transfer
+          </button>
+
+          <button onClick={(e) => {
+            e.preventDefault();
+            writeAgentDeposit?.()
+            console.log('agent deposit written')
+          }} className='my-button'>
+            Submit Acccept Deposit Job Transfer
+          </button>
+
+          <button onClick={(e) => {
+            e.preventDefault();
+            writeTokenA?.()
+            console.log('agent deposit written')
+          }} className='my-button'>
+            Write Token A
+          </button>
+
 
 
           <div className="buttons-container">
